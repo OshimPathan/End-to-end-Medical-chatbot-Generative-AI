@@ -1,129 +1,106 @@
-# End-to-end-Medical-chatbot-Generative-AI
-# How to run?
-### STEPS:
+# HealthMate AI: End-to-end Medical Chatbot using Generative AI
 
-Clone the repository
+HealthMate AI is a professional-grade medical chatbot that leverages Generative AI (RAG - Retrieval Augmented Generation) to provide accurate answers based on medical documentation. It features a modern, responsive dashboard interface with advanced features like chat history and resource management.
+
+![HealthMate AI Dashboard](https://raw.githubusercontent.com/your-username/End-to-end-Medical-chatbot-Generative-AI/main/static/screenshot.png) <!-- Replace with actual screenshot URL when available -->
+
+## 🌟 Key Features
+
+- **Advanced RAG Engine**: Combines Google Gemini Pro with Pinecone Vector Database for highly relevant medical answers.
+- **Professional UI/UX**: Modern dark-themed dashboard with glassmorphism effects and smooth animations.
+- **Chat History**: Persistent conversation storage using SQLite, allowing you to resume previous chats.
+- **Resource Management**: Browse the specific medical documents being used as the knowledge base.
+- **Responsive Design**: Fully functional on mobile, tablet, and desktop devices.
+- **Fast Responses**: Optimized with Gemini 2.0 Flash for near-instant answers.
+
+## 🛠️ Tech Stack
+
+- **Framework**: Flask (Python)
+- **AI Orchestration**: LangChain
+- **LLM**: Google Gemini 2.0 Flash
+- **Vector Database**: Pinecone
+- **Embeddings**: Hugging Face (`all-MiniLM-L6-v2`)
+- **Database**: SQLite (for chat history)
+- **Frontend**: HTML5, CSS3 (Vanilla), JavaScript, Bootstrap 5, Font Awesome
+
+## 🚀 Installation & Setup
+
+### 1. Clone the Repository
 
 ```bash
-Project repo: https://github.com/
+git clone https://github.com/your-username/End-to-end-Medical-chatbot-Generative-AI.git
+cd End-to-end-Medical-chatbot-Generative-AI
 ```
-### STEP 01- Create a conda environment after opening the repository
+
+### 2. Create and Activate Environment
 
 ```bash
+# Using Conda
 conda create -n medibot python=3.10 -y
-```
-
-```bash
 conda activate medibot
+
+# OR using venv
+python -m venv venv
+source venv/bin/activate  # Mac/Linux
 ```
 
+### 3. Install Dependencies
 
-### STEP 02- install the requirements
 ```bash
 pip install -r requirements.txt
 ```
 
+### 4. Configuration (.env)
 
-### Create a `.env` file in the root directory and add your Pinecone & openai credentials as follows:
+Create a `.env` file in the root directory:
 
 ```ini
-PINECONE_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-OPENAI_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+PINECONE_API_KEY="your_pinecone_api_key"
+GOOGLE_API_KEY="your_google_api_key"
+PINECONE_HOST="your_pinecone_index_host" # Optional
 ```
 
+### 5. Setup Pinecone Index
+
+Create an index in [Pinecone Console](https://app.pinecone.io/):
+- **Name**: `medical-chatbot`
+- **Dimensions**: `384`
+- **Metric**: `cosine`
+
+### 6. Ingest Data
+
+Place your medical PDFs in the `data/` folder and run:
 
 ```bash
-# run the following command to store embeddings to pinecone
 python store_index.py
 ```
 
+### 7. Run the App
+
 ```bash
-# Finally run the following command
 python app.py
 ```
+Access the app at `http://localhost:8080`.
 
-Now,
-```bash
-open up localhost:
-```
+---
 
+## ☁️ Deployment (AWS CICD)
 
-### Techstack Used:
+This project is configured for automated deployment to AWS using GitHub Actions.
 
-- Python
-- LangChain
-- Flask
-- GPT
-- Pinecone
+### Deployment Flow:
+1. **GitHub Actions**: Triggers on push to `main`.
+2. **Docker**: Builds a container image.
+3. **ECR**: Original image is pushed to AWS Elastic Container Registry.
+4. **EC2**: A self-hosted runner pulls the latest image and deploys it.
 
+### Required GitHub Secrets:
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_DEFAULT_REGION`
+- `ECR_REPO`
+- `PINECONE_API_KEY`
+- `GOOGLE_API_KEY`
 
-# AWS-CICD-Deployment-with-Github-Actions
-
-## 1. Login to AWS console.
-
-## 2. Create IAM user for deployment
-
-	#with specific access
-
-	1. EC2 access : It is virtual machine
-
-	2. ECR: Elastic Container registry to save your docker image in aws
-
-
-	#Description: About the deployment
-
-	1. Build docker image of the source code
-
-	2. Push your docker image to ECR
-
-	3. Launch Your EC2 
-
-	4. Pull Your image from ECR in EC2
-
-	5. Lauch your docker image in EC2
-
-	#Policy:
-
-	1. AmazonEC2ContainerRegistryFullAccess
-
-	2. AmazonEC2FullAccess
-
-	
-## 3. Create ECR repo to store/save docker image
-
-	
-## 4. Create EC2 machine (Ubuntu) 
-
-## 5. Open EC2 and Install docker in EC2 Machine:
-	
-	
-	#optinal
-
-	sudo apt-get update -y
-
-	sudo apt-get upgrade
-	
-	#required
-
-	curl -fsSL https://get.docker.com -o get-docker.sh
-
-	sudo sh get-docker.sh
-
-	sudo usermod -aG docker ubuntu
-
-	newgrp docker
-	
-# 6. Configure EC2 as self-hosted runner:
-    setting>actions>runner>new self hosted runner> choose os> then run command one by one
-
-
-# 7. Setup github secrets:
-
-   - AWS_ACCESS_KEY_ID
-   - AWS_SECRET_ACCESS_KEY
-   - AWS_DEFAULT_REGION
-   - ECR_REPO
-   - PINECONE_API_KEY
-   - OPENAI_API_KEY
-
-    
+---
+*Disclaimer: This chatbot is for informational purposes only. Always consult a qualified healthcare provider for medical advice.*

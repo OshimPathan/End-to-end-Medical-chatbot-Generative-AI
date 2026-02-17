@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>HealthMate AI - Medical Assistant</title>
+	<!-- Bootstrap -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<!-- Google Fonts -->
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap"
+		rel="stylesheet">
+	<!-- Custom CSS -->
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}" />
+</head>
+
+<body>
+	<div class="main-container">
+		<!-- Sidebar -->
+		<div class="sidebar d-none d-md-flex" id="sidebar">
+			<div class="logo-section">
+				<i class="fas fa-heartbeat fa-2x text-primary p-2 bg-primary-subtle rounded-3"></i>
+				<h5>HealthMate AI</h5>
+			</div>
+
+			<div class="menu-items">
+				<div class="menu-item active" data-action="new-chat">
+					<i class="fas fa-plus-circle"></i> New Chat
+				</div>
+				<div class="menu-item" data-action="history">
+					<i class="fas fa-history"></i> History
+				</div>
+				<div class="menu-item" data-action="resources">
+					<i class="fas fa-book-medical"></i> Resources
+				</div>
+				<div class="menu-item mt-auto" data-action="settings">
+					<i class="fas fa-cog"></i> Settings
+				</div>
+			</div>
+
+			<div class="user-profile">
+				<div class="user-avatar">
+					<i class="fas fa-user"></i>
+				</div>
+				<div class="user-info">
+					<span class="name">Guest User</span>
+					<span class="status">Online</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Chat Area -->
+		<div class="chat-area">
+			<!-- Header -->
+			<div class="chat-header">
+				<div class="d-flex align-items-center">
+					<button class="btn btn-link text-white d-md-none me-3 p-0" id="toggleSidebar">
+						<i class="fas fa-bars fa-lg"></i>
+					</button>
+					<div class="bot-avatar me-3">
+						<img src="https://ui-avatars.com/api/?name=Medical+Bot&background=0D6EFD&color=fff&font-size=0.5"
+							alt="Bot">
+						<span class="status-dot"></span>
+					</div>
+					<div class="header-info">
+						<h5 class="mb-0">Medical GenAI Assistant</h5>
+						<small>Powered by Gemini Pro & Pinecone</small>
+					</div>
+				</div>
+				<div class="header-actions">
+					<button class="btn btn-dark btn-sm rounded-circle"><i class="fas fa-ellipsis-v"></i></button>
+				</div>
+			</div>
+
+			<!-- Chat Body -->
+			<div id="messageFormeight" class="chat-body">
+				<!-- Welcome Message -->
+				<div class="d-flex justify-content-start mb-4">
+					<div class="img_cont_msg">
+						<img src="https://ui-avatars.com/api/?name=Medical+Bot&background=0D6EFD&color=fff&font-size=0.5"
+							class="rounded-circle user_img_msg">
+					</div>
+					<div class="msg_cotainer">
+						Hello! I am your advanced Medical AI Assistant.
+						<br><br>
+						I can help you answer questions based on the provided medical documentation. How can I assist
+						you today?
+						<span class="msg_time">Now</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<div class="chat-footer">
+				<form id="messageArea" class="d-flex flex-column align-items-center">
+					<div class="input-group w-100 input-container">
+						<input type="text" id="text" name="msg" placeholder="Type your medical query here..."
+							autocomplete="off" class="form-control type_msg" required />
+						<button type="submit" id="send" class="btn send_btn">
+							<i class="fas fa-paper-plane"></i>
+						</button>
+					</div>
+					<small class="disclaimer-text">AI can make mistakes. Please verify important information.</small>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modals -->
+	<!-- Resources Modal -->
+	<div class="modal fade" id="resourcesModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content bg-dark text-white">
+				<div class="modal-header border-secondary">
+					<h5 class="modal-title"><i class="fas fa-book-medical text-primary me-2"></i>Medical Resources</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<ul id="resourceList" class="list-group list-group-flush">
+						<!-- Resources will be loaded here -->
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Settings Modal -->
+	<div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content bg-dark text-white">
+				<div class="modal-header border-secondary">
+					<h5 class="modal-title"><i class="fas fa-cog text-primary me-2"></i>Settings</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="d-grid gap-2">
+						<button id="clearHistoryBtn" class="btn btn-outline-danger">
+							<i class="fas fa-trash-alt me-2"></i>Clear Chat History
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			// Sidebar Toggle
+			$("#toggleSidebar").click(function (e) {
+				e.preventDefault();
+				$("#sidebar").toggleClass("d-none active");
+			});
+
+			// --- Sidebar Actions ---
+
+			// Format timestamp helper
+			function formatTime(timestamp) {
+				const date = timestamp ? new Date(timestamp) : new Date();
+				return date.getHours() + ":" + String(date.getMinutes()).padStart(2, '0');
+			}
+
+			// New Chat
+			$(".menu-item[data-action='new-chat']").click(function () {
+				$("#messageFormeight").empty();
+				var welcomeHtml = `
+                <div class="d-flex justify-content-start mb-4">
+                    <div class="img_cont_msg">
+                        <img src="https://ui-avatars.com/api/?name=Medical+Bot&background=0D6EFD&color=fff&font-size=0.5" class="rounded-circle user_img_msg">
+                    </div>
+                    <div class="msg_cotainer">
+                        Hello! I am your advanced Medical AI Assistant. 
+                        <br><br>
+                        I can help you answer questions based on the provided medical documentation. How can I assist you today?
+                        <span class="msg_time">Now</span>
+                    </div>
+                </div>`;
+				$("#messageFormeight").append(welcomeHtml);
+				$(".menu-item").removeClass("active");
+				$(this).addClass("active");
+			});
+
+			// History
+			$(".menu-item[data-action='history']").click(function () {
+				$(".menu-item").removeClass("active");
+				$(this).addClass("active");
+
+				$.get("/history", function (data) {
+					$("#messageFormeight").empty();
+					console.log("History Data:", data);
+
+					if (data.length === 0) {
+						var emptyHtml = `
+                        <div class="d-flex justify-content-center mb-4">
+                            <div class="text-white bg-secondary p-2 rounded">
+                                No history available.
+                            </div>
+                        </div>`;
+						$("#messageFormeight").append(emptyHtml);
+					}
+
+					data.forEach(function (chat) {
+						// User message
+						var userHtml = `
+                        <div class="d-flex justify-content-end mb-4">
+                            <div class="msg_cotainer_send">
+                                ${chat.user_msg}
+                                <span class="msg_time_send">${formatTime(chat.timestamp)}</span>
+                            </div>
+                            <div class="img_cont_msg">
+                                <img src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff" class="rounded-circle user_img_msg">
+                            </div>
+                        </div>`;
+						$("#messageFormeight").append(userHtml);
+
+						// Bot response
+						var botHtml = `
+                        <div class="d-flex justify-content-start mb-4">
+                            <div class="img_cont_msg">
+                                <img src="https://ui-avatars.com/api/?name=Medical+Bot&background=0D6EFD&color=fff&font-size=0.5" class="rounded-circle user_img_msg">
+                            </div>
+                            <div class="msg_cotainer">
+                                ${chat.bot_response}
+                                <span class="msg_time">${formatTime(chat.timestamp)}</span>
+                            </div>
+                        </div>`;
+						$("#messageFormeight").append(botHtml);
+					});
+					scrollToBottom();
+				});
+			});
+
+			// Resources
+			$(".menu-item[data-action='resources']").click(function () {
+				$.get("/resources", function (files) {
+					var listHtml = "";
+					if (files.length === 0) {
+						listHtml = "<li class='list-group-item bg-dark text-white border-secondary'>No resources found in data directory.</li>";
+					} else {
+						files.forEach(function (file) {
+							listHtml += `<li class="list-group-item bg-dark text-white border-secondary">
+                                <i class="fas fa-file-pdf text-danger me-2"></i>${file}
+                            </li>`;
+						});
+					}
+					$("#resourceList").html(listHtml);
+					var myModal = new bootstrap.Modal(document.getElementById('resourcesModal'));
+					myModal.show();
+				});
+			});
+
+			// Settings
+			$(".menu-item[data-action='settings']").click(function () {
+				var myModal = new bootstrap.Modal(document.getElementById('settingsModal'));
+				myModal.show();
+			});
+
+			// Clear History Action
+			$("#clearHistoryBtn").click(function () {
+				if (confirm("Are you sure you want to delete all chat history?")) {
+					$.post("/clear_history", function (response) {
+						if (response.status === "success") {
+							alert("History cleared!");
+							$("#messageFormeight").empty();
+							// Reload welcome message
+							$(".menu-item[data-action='new-chat']").click();
+							// Close modal
+							var myModalEl = document.getElementById('settingsModal');
+							var modal = bootstrap.Modal.getInstance(myModalEl)
+							modal.hide();
+						}
+					});
+				}
+			});
+
+
+			// Chat Submission
+			$("#messageArea").on("submit", function (event) {
+				event.preventDefault();
+
+				const date = new Date();
+				const str_time = date.getHours() + ":" + String(date.getMinutes()).padStart(2, '0');
+				var rawText = $("#text").val();
+
+				if (rawText.trim() === "") return;
+
+				var userHtml = `
+                    <div class="d-flex justify-content-end mb-4">
+                        <div class="msg_cotainer_send">
+                            ${rawText}
+                            <span class="msg_time_send">${str_time}</span>
+                        </div>
+                        <div class="img_cont_msg">
+                            <img src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff" class="rounded-circle user_img_msg">
+                        </div>
+                    </div>`;
+
+				$("#text").val("");
+				$("#messageFormeight").append(userHtml);
+
+				// Add Loading Animation
+				var loadingHtml = `
+                    <div class="d-flex justify-content-start mb-4" id="loading">
+                        <div class="img_cont_msg">
+                            <img src="https://ui-avatars.com/api/?name=Medical+Bot&background=0D6EFD&color=fff&font-size=0.5" class="rounded-circle user_img_msg">
+                        </div>
+                        <div class="msg_cotainer">
+                            <div class="typing-dots">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </div>
+                    </div>`;
+				$("#messageFormeight").append(loadingHtml);
+				scrollToBottom();
+
+				$.ajax({
+					data: { msg: rawText },
+					type: "POST",
+					url: "/get",
+				}).done(function (data) {
+					$("#loading").remove();
+
+					var botHtml = `
+                        <div class="d-flex justify-content-start mb-4">
+                            <div class="img_cont_msg">
+                                <img src="https://ui-avatars.com/api/?name=Medical+Bot&background=0D6EFD&color=fff&font-size=0.5" class="rounded-circle user_img_msg">
+                            </div>
+                            <div class="msg_cotainer">
+                                ${data}
+                                <span class="msg_time">${str_time}</span>
+                            </div>
+                        </div>`;
+
+					$("#messageFormeight").append(botHtml);
+					scrollToBottom();
+				});
+			});
+
+			function scrollToBottom() {
+				var chatBody = document.getElementById("messageFormeight");
+				chatBody.scrollTop = chatBody.scrollHeight;
+			}
+		});
+	</script>
+</body>
+
+</html>
