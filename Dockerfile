@@ -9,6 +9,8 @@ RUN apt-get update -y && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch==2.2.1+cpu --index-url https://download.pytorch.org/whl/cpu && \
+    sed -i '/torch==2.2.1/d' requirements.txt && \
     pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8080
