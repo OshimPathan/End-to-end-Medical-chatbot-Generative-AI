@@ -99,6 +99,9 @@
 					<div class="input-group w-100 input-container">
 						<input type="text" id="text" name="msg" placeholder="Type your medical query here..."
 							autocomplete="off" class="form-control type_msg" required />
+						<button type="button" id="micBtn" class="btn btn-link text-secondary">
+							<i class="fas fa-microphone"></i>
+						</button>
 						<button type="submit" id="send" class="btn send_btn">
 							<i class="fas fa-paper-plane"></i>
 						</button>
@@ -160,6 +163,46 @@
 				e.preventDefault();
 				$("#sidebar").toggleClass("d-none active");
 			});
+
+			// Voice Recognition Setup
+			const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+			let recognition;
+			if (SpeechRecognition) {
+				recognition = new SpeechRecognition();
+				recognition.continuous = false;
+				recognition.lang = 'en-US';
+				recognition.interimResults = false;
+
+				recognition.onresult = function (event) {
+					const transcript = event.results[0][0].transcript;
+					$("#text").val(transcript);
+					// Optional: Automatically send
+					// $("#messageArea").submit();
+				};
+
+				recognition.onerror = function (event) {
+					console.error("Speech recognition error", event.error);
+				};
+			}
+
+			// Text to Speech
+			function speak(text) {
+				const synth = window.speechSynthesis;
+				if (synth.speaking) {
+					console.error('speechSynthesis.speaking');
+					return;
+				}
+				if (text !== '') {
+					const utterThis = new SpeechSynthesisUtterance(text);
+					utterThis.onend = function (event) {
+						console.log('SpeechSynthesisUtterance.onend');
+					}
+					utterThis.onerror = function (event) {
+						console.error('SpeechSynthesisUtterance.onerror');
+					}
+					synth.speak(utterThis);
+				}
+			}
 
 			// --- Sidebar Actions ---
 
@@ -283,6 +326,22 @@
 			});
 
 
+			// Mic Button Click
+			$("#micBtn").click(function () {
+				if (recognition) {
+					recognition.start();
+					$(this).addClass("text-danger").removeClass("text-secondary");
+				} else {
+					alert("Speech recognition not supported in this browser.");
+				}
+			});
+
+			if (recognition) {
+				recognition.onend = function () {
+					$("#micBtn").removeClass("text-danger").addClass("text-secondary");
+				};
+			}
+
 			// Chat Submission
 			$("#messageArea").on("submit", function (event) {
 				event.preventDefault();
@@ -344,6 +403,7 @@
 
 					$("#messageFormeight").append(botHtml);
 					scrollToBottom();
+					speak(data); // Speak the response
 				});
 			});
 
