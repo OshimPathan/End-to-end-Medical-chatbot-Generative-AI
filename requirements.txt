@@ -1,4 +1,4 @@
-torch==2.2.1
+torch==2.2.1+cpu --index-url https://download.pytorch.org/whl/cpu
 sentence-transformers==2.2.2
 langchain==0.2.16
 langchain-community==0.2.16
