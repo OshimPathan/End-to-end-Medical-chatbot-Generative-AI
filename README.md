@@ -1,8 +1,10 @@
-# HealthMate AI: End-to-end Medical Chatbot using Generative AI
+# <img src="static/images/logo.png" width="40" height="40"> HealthMate AI: End-to-end Medical Chatbot using Generative AI
 
 HealthMate AI is a professional-grade medical chatbot that leverages Generative AI (RAG - Retrieval Augmented Generation) to provide accurate answers based on medical documentation. It features a modern, responsive dashboard interface with advanced features like chat history and resource management.
 
-![HealthMate AI Dashboard](https://raw.githubusercontent.com/your-username/End-to-end-Medical-chatbot-Generative-AI/main/static/screenshot.png) <!-- Replace with actual screenshot URL when available -->
+<p align="center">
+  <img src="static/images/logo.png" width="200" alt="HealthMate AI Logo">
+</p>
 
 ## 🌟 Key Features
 
@@ -28,7 +30,7 @@ HealthMate AI is a professional-grade medical chatbot that leverages Generative 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/End-to-end-Medical-chatbot-Generative-AI.git
+git clone https://github.com/OshimPathan/End-to-end-Medical-chatbot-Generative-AI.git
 cd End-to-end-Medical-chatbot-Generative-AI
 ```
 
