@@ -41,6 +41,9 @@ if not PINECONE_API_KEY or not GOOGLE_API_KEY:
 embeddings = download_hugging_face_embeddings()
 
 
+
+os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
+
 docsearch=PineconeVectorStore.from_existing_index(
     index_name="medical-chatbot",
     embedding=embeddings
